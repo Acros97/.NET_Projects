@@ -1,0 +1,42 @@
+public partial class Index : System.Web.UI.Page
+    {
+       internal const string _cnn = "Data Source=.; Initial Catalog=Prueba; Integrated Security=true";
+
+        protected void Page_Load(object sender, EventArgs e)
+        {
+            if (!IsPostBack)
+            {
+                List<Persona> _personas = new List<Persona>();
+
+                SqlConnection _conexion = new SqlConnection(_cnn);
+                SqlCommand _comando = new SqlCommand("List_storedProcedure", _conexion);
+                _comando.CommandType = CommandType.StoredProcedure;
+                try
+                {
+                    _conexion.Open();
+                    SqlDataReader _lector = _comando.ExecuteReader();
+
+                        while (_lector.Read())
+                        {
+                            _personas.Add(new Persona((int)_lector["ID_Persona"], (string)_lector["Nombre"], (int)_lector["Edad"]));
+                            gvPersona.DataSource = _personas;
+                            gvPersona.DataBind();
+                        }
+                        _lector.Close();
+                    }
+                
+                catch (Exception ex)
+                {
+                    lblError.Visible = true;
+                    lblError.Text = ex.Message;
+                }
+
+                finally { _conexion.Close(); }
+
+
+            }
+        }
+
+
+     }
+}
